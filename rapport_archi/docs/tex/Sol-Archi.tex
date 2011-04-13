@@ -1,0 +1,64 @@
+
+%!TEX encoding = UTF-8 Unicode
+\documentclass [a4paper] {report}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\usepackage{hyperref}
+\usepackage{eurosym}
+\begin {document}
+\section{Solution}
+
+
+
+
+Solution:
+
+Organisation de la solution dans la version multi-sites
+Éléments clefs du cahier des charges et impact sur la solution
+Schéma global
+
+La problématique consiste à restructurer l'architecture d'un réseau inter-établissement (réseau industriel et réseau de gestion) afin de permettre de déplacer facilement des équipements d'un établissement à un autre et de pouvoir limiter la pollution du réseau lors du broadcast des variables globales des différents équipements industriels.
+
+Dans une première ébauche de l'architecture, nous avions opté pour un VLAN(Réseau Local Virtuel, Regroupement un ensemble de machines de façon logique et non physique) de niveau 3 afin de pouvoir broadcaster les variables globales sur les différents VLAN des établissements. Cependant, compte tenu des contraintes matérielles imposées par le cahier des charges, nous avons dû modifier l'architecture étant donné que les équipements réseau imposés par le client ne supportent pas le VLAN de niveau 3, mais seulement celui de niveau 2 (également appelé VLAN MAC, ce type de VLAN est beaucoup plus souple  que le VLAN par port car le réseau est indépendant de la localisation de la station). 
+
+
+Les avantages d'utiliser un VLAN:
+Plus de souplesse pour l'administration et les modifications du réseau car toute l'architecture peut être modifiée par simple paramétrage des commutateurs
+Gain en sécurité car les informations sont encapsulées dans un niveau supplémentaire et éventuellement analysées
+Réduction de la diffusion du trafic sur le réseau
+
+Ces contraintes vont avoir un impact important sur l'organisation du réseau puisque chaque VLAN sera alors isolé, le broadcast des variables globales vers le réseau d'un autre établissement ne sera alors plus possible. 
+Les utilisateurs pourront accéder à distance aux réseaux des établissements en utilisant la fonction RAS (Remote Access Service) des routeurs qui permettent d'établir une connexion sécurisée à  distance via le réseau téléphonique, en fonction des droits attribués par le firewall. 
+
+
+
+
+
+
+ \section{Nouvelle architecture matérielle
+
+Matériel à acquérir :
+
+Afin de répondre à la problématique, les équipements réseaux suivant ont été retenu:
+Routeur S@n 2000
+Rôle : interconnexion de tous les équipements locaux et liaison VPN pour les équipements distants
+Lieu : site central
+
+	L'achat d'un routeur est discutable. En effet, les fonctionnalités de routeur n'étaient pas indispensables à la mise en place d'un réseau VPN (on aurait pu opter pour une solution de serveur VPN logiciel, sur serveur dédié ou sur un serveur préexistant).
+	Cependant, la matérialisation du réseau de l'AIPRAO est plus élégante.En outre, la majorité des équipements sont situés au même emplacement que ce routeur, et le fait que ces connexions ne soient pas cryptées et encapsulées dans un tunnel VPN ne peut qu'améliorer les performances de l'ensemble.
+	A fortiori, ce routeur représente un excellent compromis entre sécurité et simplicité d'administration, étant données les conditions d'utilisation et de maintenance du réseau de l'AIPRAO : faible criticité des données véhiculées, exigeances de disponibilité modérées, compétences informatiques modérées de l'administrateur habituel.
+
+
+Switch administrable 8 ports TCS ESM 083F23F0
+Rôle : Relier tous les équipements d'une même plateforme
+Débit : 10 Base-T / 100 Base-TX
+
+
+Switch administrable 16 ports TCS ESM 163F23F0
+Rôle : Relier plusieurs équipements à l'intérieur d'une des trois salle de l'AIPRAO
+Débit : 10 Base-T / 100 Base-TX
+Fonctionnalité: Client FDR, SMTP V3, SNTP, fi ltrage multicast d’optimisation du protocole Global Data, confi guration par accès Web VLAN, IGMP Snooping, RSTP (Rapide Scanning Tree Protocol), port prioritaire, controle des flux, port sécurisé 
+
+
+Eventuellement, il faudra également acquérir des cartes réseaux supplémentaires pour les PC des plateformes, puisque chaque PC de plateforme devra être muni de deux cartes réseau.
