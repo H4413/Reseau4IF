@@ -2,8 +2,23 @@
 
 \subsection{Architecture multi-sites du service d'annuaire}
 
+Répartition de l'annuaire LDAP sur plusieurs machines. On utilise la méthode de
+réplication, on aura donc sur chaque site géographique une machine contenant 
+une copie de l'annuaire. Cela permet de toujours se connecter au serveur le 
+plus proche de l'utilisateur envoyant une requête et en plus une résistance 
+aux pannes. En effet, si le serveur du site géographique est en panne, on peut
+se connecter à un des autres serveurs sur site distant.
+
 \subsection{Politique de nommage}
+
+
 
 \subsection{Relation entre les serveurs}
 
+Les différents serveurs communniquent entre eux en fonction du nom de domaine. 
+Le DNS local permet d'identifier directement une machine sur son réseau local.
+
+
 \subsection{Enregistrements}
+
+
