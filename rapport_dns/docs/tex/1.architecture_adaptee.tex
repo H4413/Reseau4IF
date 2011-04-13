@@ -11,7 +11,48 @@ se connecter à un des autres serveurs sur site distant.
 
 \subsection{Politique de nommage}
 
+De manière générale, l'ensemble de numérotation comprenant des "xx", signifient 
+que la numérotation peut aller de 01 à 99.
 
+\subsubsection{Niveau Site}
+
+Le nom du site sera choisi pour AIPRAO. La seconde extension sera choisie en fonction
+du site ou se trouve l'objet réseau concerné. 
+
+Exemple : ge.aiprao pour les objets du bâtiment du site GE. 
+
+Nous choisissons pour l'ensemble des sites : 
+\begin{itemize}
+\item central.aiprao
+\item ge.aiprao
+\item roanne.aiprao
+\end{itemize}
+
+\subsubsection{Serveurs}
+
+Nous créeons un sous domaine appelé serveur. Les serveurs auront pour nom leur 
+principale fonctionnalité associée à leur numéro de serveur. 
+
+Exemple : Nom du serveur LDAP situé au batiment central : ldap-01.serveur.central.aiprao
+
+\subsubsection{Niveau Salle}
+
+Les PC auront pour nom "pc-xx", xx étant le numéro du pc. Le premier PC aura 
+pour numéro 01.
+
+Exemple : le situé pc en GE aura pour nom pc-01.ge.aiprao .
+
+\subsubsection{Site Central}
+
+Les plateformes de manipulation auront pour nom de domaine "pl-xx".
+
+Les automates auront pour nommage "a-xx". 
+
+Exemple : le deuxième automate de la première plateforme aura pour nom : 
+
+a-02.pl-01.central.aiprao
+
+Les webcams auront pour nom "webcam-xx".
 
 \subsection{Relation entre les serveurs}
 
