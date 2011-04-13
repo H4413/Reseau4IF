@@ -1,5 +1,8 @@
 \section{Proposition d'une architecture adaptée}
 
+
+
+
 \subsection{Architecture multi-sites du service d'annuaire}
 
 Répartition de l'annuaire LDAP sur plusieurs machines. On utilise la méthode de
@@ -8,6 +11,15 @@ une copie de l'annuaire. Cela permet de toujours se connecter au serveur le
 plus proche de l'utilisateur envoyant une requête et en plus une résistance 
 aux pannes. En effet, si le serveur du site géographique est en panne, on peut
 se connecter à un des autres serveurs sur site distant.
+
+\subsection{Architecture DNS}
+
+On mettra en place un serveur DNS par site où se trouve l'AIP. Ceux-ci géreront 
+les accès extérieurs au réseau au niveau de la connexion vers l'établissement. 
+De plus ils connaitront les autres serveurs DNS des sites distants de l'AIP. 
+
+On veillera à ajouter les entrées concernant les serveurs DNS de l'AIP sur les 
+serveurs de niveaux supérieurs possédés par les établissements. 
 
 \subsection{Politique de nommage}
 
@@ -30,10 +42,10 @@ Nous choisissons pour l'ensemble des sites :
 
 \subsubsection{Serveurs}
 
-Nous créeons un sous domaine appelé serveur. Les serveurs auront pour nom leur 
+Nous créons un sous domaine appelé serveur. Les serveurs auront pour nom leur 
 principale fonctionnalité associée à leur numéro de serveur. 
 
-Exemple : Nom du serveur LDAP situé au batiment central : ldap-01.serveur.central.aiprao
+Exemple : Nom du serveur LDAP situé au bâtiment central : ldap-01.serveur.central.aiprao
 
 \subsubsection{Niveau Salle}
 
@@ -56,7 +68,7 @@ Les webcams auront pour nom "webcam-xx".
 
 \subsection{Relation entre les serveurs}
 
-Les différents serveurs communniquent entre eux en fonction du nom de domaine. 
+Les différents serveurs communiquent entre eux en fonction du nom de domaine. 
 Le DNS local permet d'identifier directement une machine sur son réseau local.
 
 
