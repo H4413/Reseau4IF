@@ -1,9 +1,9 @@
 # Insert infos here:
-TITLE="Tutoriel: outils de base"
+TITLE="Tutoriel : outils de base"
 
-AUTHOR="H4413: K. Abanto, V. Borges, C. Geiger, R. Lizé, Hugo Pastore, Q. Villers"
+AUTHOR="H4413 : K. Abanto, V. Borges, C. Geiger, R. Lizé, Hugo Pastore, Q. Villers"
 
-FILE="H4413-${TITLE// /_}"
+FILE="tuto"
 
 LANG="francais"
 # For hyphenation and other language dependant stuff
