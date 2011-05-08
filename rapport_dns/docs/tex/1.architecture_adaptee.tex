@@ -1,8 +1,5 @@
 \section{Proposition d'une architecture adaptée}
 
-
-
-
 \subsection{Architecture multi-sites du service d'annuaire}
 
 Répartition de l'annuaire LDAP sur plusieurs machines. On utilise la méthode de
@@ -16,9 +13,9 @@ se connecter à un des autres serveurs sur site distant.
 
 On mettra en place un serveur DNS par site où se trouve l'AIP. Ceux-ci géreront 
 les accès extérieurs au réseau au niveau de la connexion vers l'établissement. 
-De plus ils connaitront les autres serveurs DNS des sites distants de l'AIP. 
+De plus ils connaîtront les autres serveurs DNS des sites distants de l'AIP. 
 
-On veillera à ajouter les entrées concernant les serveurs DNS de l'AIP sur les 
+On veillera à ajouter les entrées de type (R) concernant les serveurs DNS de l'AIP sur les 
 serveurs de niveaux supérieurs possédés par les établissements. 
 
 \subsection{Politique de nommage}
@@ -71,7 +68,34 @@ Les webcams auront pour nom "webcam-xx".
 Les différents serveurs communiquent entre eux en fonction du nom de domaine. 
 Le DNS local permet d'identifier directement une machine sur son réseau local.
 
-
 \subsection{Enregistrements}
+\begin{itemize}
+\item[A] nom d'hôte correspondant à une adresse IPv4;
 
+[name] IN A [IPv4]
+aiprao.insa-lyon.fr  IN      A       10.0.0.11
+
+\item[AAAA] nom d'hôte correspond à une adresse IPv6;
+
+[name] [number] IN AAAA [IPv6]
+www.l.google.com.       77      IN      AAAA    2a00:1450:8004::68
+
+\item[CNAME] record ou canonical name record qui permet de créer un alias entre 2 domaines;
+
+[name] IN CNAME [name]
+aiprao.insa-lyon.fr.              IN      CNAME       central.aiprao.insa-lyon.fr.
+
+\item[PTR] record ou pointer record qui associe une adresse IP à un enregistrement de nom de domaine, aussi dit « reverse », il est le complémentaire de l'enregistrement A;
+
+[IP] IN PTR [name]
+10.0.0.11  IN   PTR     aiprao.insa-lyon.fr.
+
+\item[NS] record ou name server record qui définit les serveurs DNS de ce domaine ;
+
+[name] NS [name]
+aiprao.insa-lyon.fr      NS  dns.aiprao.insa-lyon.fr.
+
+\item[SOA] record ou Start Of Authority record qui donne les informations générales de la zone : serveur principal, courriel de contact, différentes durées dont celle d'expiration, numéro de série de la zone ;
+[name] IN SOA [name] [email] [serial] [refresh] [retry] [expire] [minimumTTL]
+aiprao.insa-lyon.fr	IN      SOA     dns.aiprao.insa-lyon.fr. admin.aiprao.insa-lyon.fr. 2010060311 43200 7200 1209600 3600
 
