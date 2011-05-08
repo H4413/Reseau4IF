@@ -1,8 +1,12 @@
 \section{Configuration DHCP}
 
+'x' correspond au site de 1 à 4 : 1 pour Lyon, 2 pour la salle GE, 3 pour Roanne,
+4 pour Saint-Etienne.  
+
+
 \subsection{Adresse réseau}
 
-10.0.x.252
+L'adresse du serveur DHCP sur chaque site sera 10.0.x.252.
 
 \subsection{Masque de sous réseau}
 
@@ -10,32 +14,38 @@
 
 \subsection{Plage d'adresses IP de réseau}
 
-10.0.x.1 à 10.0.x.250
+Les adresses IP des machines sont sur la plage 10.0.x.1 à 10.0.x.250.
+On peut donc connecter 250 machines par sous-réseau.
 
 \subsection{Durée du bail}
 
-Bail long.
+La durée du bail sera fixée à long pour éviter les conflits si trop de machines 
+viennent à être connectées.
 
 \subsection{Routeur}
 
-10.0.x.254
+L'adresse du routeur sur chaque site sera de 10.0.x.254.
 
 \subsection{Adresse du DNS}
 
-10.0.x.253
+L'adresse du serveur DNS sur chaque site sera 10.0.x.253.
 
 \subsection{Nom de l'étendue}
 
-
+On va faire 2 étendues par site : de 10.0.x.1 à 10.0.x.64 pour les automates et
+de 10.0.x.250 pour les autres machines.
 
 \subsection{Plage de l'exclusion}
 
-
+La plage de l'exclusion de chacune des 2 étendues est évidemment la plage 
+de l'autre étendue.
 
 \subsection{Associations MAC/IP}
 
-
-
-\subsection{Processus de récupération des adresses MAC}
+Une adresse IP est attribuée à une adresse MAC tant qu'il reste des adresses 
+disponibles pour les adresses MAC qui n'ont pas encore d'IP attribuée.
+Si les adresses sont toutes déjà attribuées sur un site et qu'une nouvelle 
+machine se connecte, l'adresse IP qui n'a pas été utilisée depuis le plus 
+de temps est réattribuée à cette nouvelle adresse MAC.
 
 
