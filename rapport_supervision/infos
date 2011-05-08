@@ -1,7 +1,7 @@
 # Insert infos here:
 TITLE="Cahier de supervision"
 
-AUTHOR="H4413: K. Abanto, V. Borges, C. Geiger, R. Lizé, Hugo Pastore, Q. Villers"
+AUTHOR="H4413"
 
 FILE="H4413-${TITLE// /_}"
 

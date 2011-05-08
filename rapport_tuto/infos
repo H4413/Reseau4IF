@@ -1,9 +1,9 @@
 # Insert infos here:
 TITLE="Tutoriel : outils de base pour un dépannage de premier niveau"
 
-AUTHOR="H4413 : K. Abanto, V. Borges, C. Geiger, R. Lizé, Hugo Pastore, Q. Villers"
+AUTHOR="H4413"
 
-FILE="tuto"
+FILE="${AUTHOR}-dépannage_premier_niveau"
 
 LANG="francais"
 # For hyphenation and other language dependant stuff
