@@ -19,6 +19,7 @@ echo "
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage{placeins}
+\usepackage{rotating}
 " >> $FILE
 
 # Encoding settings
