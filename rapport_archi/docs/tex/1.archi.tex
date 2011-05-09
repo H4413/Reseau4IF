@@ -17,7 +17,14 @@ géré par la DSI de l'université de St Étienne.
 
 Chacun des réseaux de campus est relié à RENATER. 
 
+Les différents sites communiqueront grâce à un VPN.
 
+Les automates programmables, pour ne pas polluer le réseau avec leur
+broadcast, seront isolés dans un VLAN. La configuration de ce VLAN
+se fait en utilisant le système de {\sl tags} des ports, permettant
+de faire passer toutes les informations concernant les VLAn d'unswitch
+à l'autre en utilisant qu'un seul câble de connexion entre chaque switch,
+et non pas un câble par réseau.
 
 \subsection{Site central (cf. figure \ref{ac})}
 
@@ -60,3 +67,4 @@ Le {\bf site de Roanne}, disposant d'una salle hébergeant des plateformes
 \end{center}
 
 \FloatBarrier
+
