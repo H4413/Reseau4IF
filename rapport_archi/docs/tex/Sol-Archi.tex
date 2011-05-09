@@ -19,7 +19,7 @@ globales sur les différents VLAN des établissements. Cependant, compte tenu de
 contraintes matérielles imposées par le cahier des charges, nous avons dû
 modifier l'architecture étant donné que les équipements réseau imposés par le
 client ne supportent pas le VLAN de niveau 3, mais seulement celui de niveau 2
-(également appelé VLAN MAC, ce type de VLAN est beaucoup plus souple  que le
+(également appelé VLAN MAC, ce type de VLAN est beaucoup plus souple  que le
 VLAN par port car le réseau est indépendant de la localisation de la station). 
 
 
@@ -35,7 +35,7 @@ puisque chaque VLAN sera alors isolé, le broadcast des variables globales vers
 le réseau d'un autre établissement ne sera alors plus possible. 
 Les utilisateurs pourront accéder à distance aux réseaux des établissements en
 utilisant la fonction RAS (Remote Access Service) des routeurs qui permettent
-d'établir une connexion sécurisée à  distance via le réseau téléphonique, en
+d'établir une connexion sécurisée à  distance via le réseau téléphonique, en
 fonction des droits attribués par le firewall. 
 
  \section{Nouvelle architecture matérielle
@@ -83,3 +83,41 @@ port sécurisé.
 Eventuellement, il faudra également acquérir des cartes réseaux supplémentaires
 pour les PC des plateformes, puisque chaque PC de plateforme devra être muni de
 deux cartes réseau.
+
+ Mise en place du VPN
+
+	Côté serveur, le la gestion du VPN est déléguée au routeur du site central. La documentation de cette fonctionnalité du S@n2000 étant indisponible sur internet, il convra de se renseigner auprès de Schneider lors de l'achat afin de prendre connaissances des modalités de configuration.
+
+	Côté client, le script de démarrage sera modifié afin de se connecter automatiquement au serveur VPN. Le client VPN devra être également fourni par Schneider, puisqu'il n'existe pas de client VPN libre. L'appel au client VPN se fera après l'établissement d'une connexion réseau sur le réseau local.
+
+	Rappelons que les ordinateurs localisés dans le site principal se connecterons directement au  réseau de l'AIPRAO, et ne devront donc pas lancer ce client au démarrage. Si les administrateurs système souhaitent déployer un unique script pour tout le parc, on pourra par exemple leur conseiller de tester l'adresse IP de l'interface réseau dans leur script. Si cette IP appartient à la plage réservée aux équipements de l'AIPRAO, cela signifie que l'ordinateur est sur le site principal, et qu'il n'y a pas besoin de lancer le client VPN. Dans le cas contraire, il faut lancer le  client VPN afin de se connecter au réseau à distance.
+
+	La mise en place d'un serveur d'authentification pour accéder aux service de l'AIP est également indispensable. Sa mise en oeuvre sort toutefois du cadre de cette étude,  comme spécifié dans le cahier des charges fonctionnel.
+ 
+2. Gestion des IP et du nommage
+
+Politique d'adressage
+
+	Les PC de plateforme, de contrôle de caméra et les serveurs disposent, sur le réseau privé virtuel, d'une adresse IP fixe. les modifications que nous apportons à l'architecture du réseau n'a aucun impact sur leur interface avec le réseau local ; ces équipements demeurent soumis aux règles préétablies par les DSI des établissements concernés.
+
+	Quant aux PC de TP , ils se voient attribués, sur ce réseau de l'AIPRAO, une adresse IP dynamique via le serveur DHCP du S@n2000. 
+	Actuellement, tous les PC de TP sont sur le site central. Cependant, l'attribution dynamique d'adresses IP via VPN est une difficulté technique supplémentaire (notamment car les requêtes DHCP peuvent être bloquées par les firewall lorsqu'elles traversent deux réseaux distincts). 
+	Si l'on souhaite être plus générique, ou en prévision d'une demande ultérieure de rajouter des PC de TP sur des sites distants, la mise en place d'un serveur DHCP sur le réseau privé virtuel reste néanmoins possible et pourra faire l'objet d'une étude dans un second temps.
+
+
+Politique de nommage
+
+	Dans la mesure où il ne semble pas pertinent de nommer les PC de TP, tous les équipements à nommer ont une IP fixe sur le réseau de l'AIPRAO. Le serveur DNS, physiquement sur le site central, fera donc une correspondance statique entre les adresses IP et les noms de machines des équipements nommés. 
+	
+	Pour les plateformes, le nom explicitera la nature de l'expérience associée.
+	Ex : opencan.aiprao.fr.
+
+	Pour les différents serveurs ainsi que les PC de contrôle des vidéos, on précisera leur localisation ainsi que leur fonction. On pourra utiliser des alias pour faire pointer plusieurs noms vers la même machine, si celle-ci fournit plusieurs services. On adoptera le nom serveurvideo postfixé d'un numéro pour tous les PC de contrôle des vidéos.
+	Ex : dns-sitecentral.aiprao.fr ; serveurvideo1-sitecentral.aiprao.fr 
+	Ces deux noms peuvent tous deux désigner la même adresse IP.
+
+	Cette configuration est d'une faible difficulté technique, et n'occasionne pas de maintenance compliquée, ce qui est un enjeu important dans le contexte de ce projet.
+
+	En prévision de l'ajout ou de modification de matériel, il faudra également éditer une procédure à suivre, en adoptant du vocabulaire peu technique, à destination des personnes qui s'occupe de la maintenance et n'ont pas de formation poussée en réseau. 
+	Plus précisément, cette procédure devra expliquer comment assigner à l'ordinateur passerelle d'une plateforme, ou à un serveur, une ip statique non-encore attribuée dans la plage des IP statiques du réseau de l'AIPRAO, puis comment nommer et référencer cette machine auprès du serveur DNS.
+On pourra, pour se faire, étudier la faisabilité du développement d'un script dans un langage quelconque (ou pourquoi pas sous Nagios) facilitant la manoeuvre.
