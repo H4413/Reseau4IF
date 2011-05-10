@@ -27,8 +27,8 @@ vim /etc/snmp/snmpd.conf
 
 Il faut autoriser l'accès en lecture des données SNMP.
 
-Par défaut, la ligne est décommentée. Entre la partie "First," et "Second" du fichier de configuration, il faut commenter la ligne "com2sec paranoid default public" en rajoutant un "#" puis supprimer le "#" de la ligne "com2sec readonly default public".
-
+Par défaut, la ligne est décommentée. Entre la partie "First," et "Second" du fichier de configuration, il faut commenter la ligne "com2sec paranoid default public" en rajoutant un "\#" puis supprimer le "\#" de la ligne "com2sec readonly default public".
+\begin{verbatim}
 ####
 # First, map the community name (COMMUNITY) into a security name
 # (local and mynetwork, depending on where the request is coming
@@ -41,10 +41,11 @@ com2sec readonly default public
 
 ####
 # Second, map the security names into group names:
-
+\end{verbatim}
 
 Modifier la partie "syslocation" en mettant le pays où se trouve votre serveur, donc "syslocation France", il faut également modifier le contact "syscontact", j'ai mis "syscontact MonPseudo <root@localhost>"
 
+\begin{verbatim}
 ###############################
 # System contact information
 #
@@ -58,47 +59,55 @@ Modifier la partie "syslocation" en mettant le pays où se trouve votre serveur,
 
 syslocation France (configure /etc/snmp/snmpd.local.conf)
 syscontact Zigzig <root@localhost> (configure /etc/snmp/snmpd.local.conf)
-
+\end{verbatim}
 
 Comme toutes les modifications, il faut redémarrer le service, on redémarre donc SNMP :
-
+\begin{verbatim}
 /etc/init.d/snmpd restart
-
+\end{verbatim}
 
 \section{Configuration MRTG}
 
 Nous allons créer le dossier qui va contenir les graphiques :
 
+\begin{verbatim}
 mkdir /var/www/blog/stats/mrtg
+\end{verbatim}
 
 
 Bien évidemment, vous pouvez spécifier un autre dossier ;)
 
 Nous allons générer un début de configuration pour MRTG :
 
+\begin{verbatim}
 cfgmaker 
 --global 'WorkDir: /var/www/blog/stats/mrtg' 
 --global 'Language: french' 
 --global 'Options[_]: bits,growright' 
 --ifdesc=descr public@localhost 
 --output /etc/mrtg.cfg
+\end{verbatim}
 
 
 "WorkDir" désigne l'emplacement où seront enregistrés les graphiques. Les miens sont stockés dans le dossier "/var/www/blog/stats/mrtg"
 "Language: french" désigne la langue, on met donc "french" pour Français.
-"Options[_]: bits,growright" on définit l'unité de mesure en bits.
+"Options[\_]: bits,growright" on définit l'unité de mesure en bits.
 "--output /etc/mrtg.cfg" désigne l'emplacement du fichier de configuration de mrtg : "/etc/mrtg.cfg". Ainsi, le fichier sera généré dans le repertoire "/etc" et aura comme nom "mrtg.cfg"
 
 Nous pouvons maintenant voir le fichier de configuration :
 
+\begin{verbatim}
 vim /etc/mrtg.cfg
+\end{verbatim}
 
 
 Nous le modifierons plus tard.
 
 Nous allons générer la page HTML pour voir ce que MRTG peut nous faire :
 
+\begin{verbatim}
 indexmaker /etc/mrtg.cfg --output=/var/www/blog/stats/mrtg/index.html
+\end{verbatim}
 
 
 "indexmaker" est l'outil pour générer les pages html de MRTG.
@@ -107,19 +116,25 @@ indexmaker /etc/mrtg.cfg --output=/var/www/blog/stats/mrtg/index.html
 
 Les pages sont crées. Pour mettre les graphiques à jour, exécutez :
 
+\begin{verbatim}
 /usr/bin/mrtg /etc/mrtg.cfg
+\end{verbatim}
 
 
 si le paquet est installé par apt-get install mrtg, le paquet configure Cron tout seul pour que les graphiques soient mises à jours toutes les 5 minutes donc vous n'avez besoin de suivre les 4 lignes suivantes :
 
 Nous allons utiliser CronTab pour éviter de le mettre à jour à la main.
 
+\begin{verbatim}
 crontab -e
+\end{verbatim}
 
 
 On rajoute un ligne : 
 
+\begin{verbatim}
 0-59/5 * * * * /usr/bin/mrtg /etc/mrtg.cfg
+\end{verbatim}
 
 
 Ce qui veut dire que la mise à jour sera exécutée par le système toutes les 5 minutes.
@@ -131,11 +146,14 @@ Pour le moment, seul le trafic réseau est visible, nous allons rajouter le moni
 
 On édite le fichier de configuration MRTG :
 
+\begin{verbatim}
 vim /etc/mrtg.cfg
+\end{verbatim}
 
 
 On rajoute à la fin la charge CPU : 
 
+\begin{verbatim}
 #---------CPU-----------------------
 Target[cpu]:ssCpuRawUser.0&ssCpuRawUser.0:public@localhost + ssCpuRawSystem.0&ssCpuRawSystem.0:public@localhost + ssCpuRawNice.0&ssCpuRawNice.0:public@localhost
 RouterUptime[cpu]: public@localhost 
@@ -153,12 +171,14 @@ LegendI[cpu]: Actif
 LegendO[cpu]: 
 Options[cpu]: growright,nopercent
 #--------end CPU-----------------------
+\end{verbatim}
 
 
 Ainsi, on additionne la charge utilisateur et système pour avoir la charge totale.
 
 Pour la RAM et le SWAP, on rajoute ce code à la suite de celui de la charge du processeur :
 
+\begin{verbatim}
 #---------SWAP--------------------
 Target[swap]: memAvailSwap.0&memTotalSwap.0:public@localhost
 Options[swap]: nopercent,growright,gauge,noinfo
@@ -173,8 +193,10 @@ LegendO[swap]: Swap total
 Legend1[swap]: Swap disponible
 Legend2[swap]: Swap total
 #--------end SWAP----------------------
+\end{verbatim}
 
 
+\begin{verbatim}
 #---------RAM-------------------
 Target[ram]: memAvailReal.0&memTotalReal.0:public@localhost
 Options[ram]: nopercent,growright,gauge,noinfo
@@ -189,7 +211,7 @@ LegendO[ram]: RAM total
 Legend1[ram]: RAM disponible
 Legend2[ram]: RAM total
 #--------end RAM--------------------
-
+\end{verbatim}
 
 Explication :
 
