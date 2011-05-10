@@ -1,3 +1,206 @@
 \vfill \pagebreak
-\part{Monitoring d'un serveur Linux}
-% Intro
+\part{Monitoring d'un serveur Linux avec MRTG}
+
+\section{Introduction}
+
+Mrtg (Multi Router Traffic Grapher) est un outil graphique fournissant les statistiques d'un serveur. Vous allez pouvoir connaître la RAM disponible, la charge CPU, la taille du SWAP, le trafic réseau, etc.
+
+Il génère un graphique journalier, hebdomadaire, mensuel et annuel, ce qui permet une bonne vue d'ensemble. Il est ainsi très aisé de détecter une saturation du serveur, que se soit au niveau du trafic réseau que de la charge du processeur.
+
+\subsection{Installation}
+
+Sous une distribuition basé en Debian, l'installation est rapide et efficace :
+
+apt-get install snmp mrtg snmpd
+
+SNMP signifie Simple Network Management Protocol, il permet de vérifier que le réseau fonctionne bien et peut retourner des informations systèmes telles que la charge du processeur, ce qui est particulièrement intéressant pour nous.
+
+MRTG va nous générer les graphiques à partir des données récupérées par SNMP.
+
+
+\subsection{Configuration SNMP}
+
+On va commencer par éditer le fichier de configuration SNMP
+
+vim /etc/snmp/snmpd.conf
+
+
+Il faut autoriser l'accès en lecture des données SNMP.
+
+Par défaut, la ligne est décommentée. Entre la partie "First," et "Second" du fichier de configuration, il faut commenter la ligne "com2sec paranoid default public" en rajoutant un "#" puis supprimer le "#" de la ligne "com2sec readonly default public".
+
+####
+# First, map the community name (COMMUNITY) into a security name
+# (local and mynetwork, depending on where the request is coming
+# from):
+
+# sec.name source community
+#com2sec paranoid default public
+com2sec readonly default public
+#com2sec readwrite default private
+
+####
+# Second, map the security names into group names:
+
+
+Modifier la partie "syslocation" en mettant le pays où se trouve votre serveur, donc "syslocation France", il faut également modifier le contact "syscontact", j'ai mis "syscontact MonPseudo <root@localhost>"
+
+###############################
+# System contact information
+#
+
+# It is also possible to set the sysContact and sysLocation system
+# variables through the snmpd.conf file. **PLEASE NOTE** that setting
+# the value of these objects here makes these objects READ-ONLY
+# (regardless of any access control settings). Any attempt to set the
+# value of an object whose value is given here will fail with an error
+# status of notWritable.
+
+syslocation France (configure /etc/snmp/snmpd.local.conf)
+syscontact Zigzig <root@localhost> (configure /etc/snmp/snmpd.local.conf)
+
+
+Comme toutes les modifications, il faut redémarrer le service, on redémarre donc SNMP :
+
+/etc/init.d/snmpd restart
+
+
+\subsection{Configuration MRTG}
+
+Nous allons créer le dossier qui va contenir les graphiques :
+
+mkdir /var/www/blog/stats/mrtg
+
+
+Bien évidemment, vous pouvez spécifier un autre dossier ;)
+
+Nous allons générer un début de configuration pour MRTG :
+
+cfgmaker 
+--global 'WorkDir: /var/www/blog/stats/mrtg' 
+--global 'Language: french' 
+--global 'Options[_]: bits,growright' 
+--ifdesc=descr public@localhost 
+--output /etc/mrtg.cfg
+
+
+"WorkDir" désigne l'emplacement où seront enregistrés les graphiques. Les miens sont stockés dans le dossier "/var/www/blog/stats/mrtg"
+"Language: french" désigne la langue, on met donc "french" pour Français.
+"Options[_]: bits,growright" on définit l'unité de mesure en bits.
+"--output /etc/mrtg.cfg" désigne l'emplacement du fichier de configuration de mrtg : "/etc/mrtg.cfg". Ainsi, le fichier sera généré dans le repertoire "/etc" et aura comme nom "mrtg.cfg"
+
+Nous pouvons maintenant voir le fichier de configuration :
+
+vim /etc/mrtg.cfg
+
+
+Nous le modifierons plus tard.
+
+Nous allons générer la page HTML pour voir ce que MRTG peut nous faire :
+
+indexmaker /etc/mrtg.cfg --output=/var/www/blog/stats/mrtg/index.html
+
+
+"indexmaker" est l'outil pour générer les pages html de MRTG.
+"/etc/mrtg.cfg" lui indique le fichier de configuration
+"--output=/var/www/blog/stats/mrtg/index.html" définit l'endroit ou sera stocké les pages HTML.
+
+Les pages sont crées. Pour mettre les graphiques à jour, exécutez :
+
+/usr/bin/mrtg /etc/mrtg.cfg
+
+
+si le paquet est installé par apt-get install mrtg, le paquet configure Cron tout seul pour que les graphiques soient mises à jours toutes les 5 minutes donc vous n'avez besoin de suivre les 4 lignes suivantes :
+
+Nous allons utiliser CronTab pour éviter de le mettre à jour à la main.
+
+crontab -e
+
+
+On rajoute un ligne : 
+
+0-59/5 * * * * /usr/bin/mrtg /etc/mrtg.cfg
+
+
+Ce qui veut dire que la mise à jour sera exécutée par le système toutes les 5 minutes.
+
+
+\subsection {Plus de monitoring}
+
+Pour le moment, seul le trafic réseau est visible, nous allons rajouter le monitoring du CPU, de la SWAP, de la RAM.
+
+On édite le fichier de configuration MRTG :
+
+vim /etc/mrtg.cfg
+
+
+On rajoute à la fin la charge CPU : 
+
+#---------CPU-----------------------
+Target[cpu]:ssCpuRawUser.0&ssCpuRawUser.0:public@localhost + ssCpuRawSystem.0&ssCpuRawSystem.0:public@localhost + ssCpuRawNice.0&ssCpuRawNice.0:public@localhost
+RouterUptime[cpu]: public@localhost 
+MaxBytes[cpu]: 100 
+Title[cpu]: CHARGE CPU
+PageTop[cpu]: Charge Active CPU \% 
+Unscaled[cpu]: ymwd 
+ShortLegend[cpu]: \% 
+YLegend[cpu]: Utilisation CPU
+Legend1[cpu]: CPU Actif en \% (Charge) 
+Legend2[cpu]: 
+Legend3[cpu]: 
+Legend4[cpu]: 
+LegendI[cpu]: Actif 
+LegendO[cpu]: 
+Options[cpu]: growright,nopercent
+#--------end CPU-----------------------
+
+
+Ainsi, on additionne la charge utilisateur et système pour avoir la charge totale.
+
+Pour la RAM et le SWAP, on rajoute ce code à la suite de celui de la charge du processeur :
+
+#---------SWAP--------------------
+Target[swap]: memAvailSwap.0&memTotalSwap.0:public@localhost
+Options[swap]: nopercent,growright,gauge,noinfo
+Title[swap]: Swap
+PageTop[swap]: Swap
+MaxBytes[swap]: 1000000000
+kMG[swap]: k,M,G,T,P,X
+Ylegend[swap]: Octets
+ShortLegend[swap]: octets
+LegendI[swap]: Swap dispo
+LegendO[swap]: Swap total
+Legend1[swap]: Swap disponible
+Legend2[swap]: Swap total
+#--------end SWAP----------------------
+
+
+#---------RAM-------------------
+Target[ram]: memAvailReal.0&memTotalReal.0:public@localhost
+Options[ram]: nopercent,growright,gauge,noinfo
+Title[ram]: RAM
+PageTop[ram]: RAM.
+MaxBytes[ram]: 1000000000
+kMG[ram]: k,M,G,T,P,X
+Ylegend[ram]: Octets
+ShortLegend[ram]: octets
+LegendI[ram]: RAM dispo
+LegendO[ram]: RAM total
+Legend1[ram]: RAM disponible
+Legend2[ram]: RAM total
+#--------end RAM--------------------
+
+
+Explication :
+
+MRTG utilise 2 courbes, il faut donc 2 données. On lui indique donc 2 sources de données : "memAvailReal.0" retourne la taille de la mémoire vive disponible, et "memTotalReal" retourne la taille de ma mémoire vive totale.
+
+On fait la même chose pour le SWAP.
+
+\subsection{Conclusion}
+
+MRTG permet de générer des graphiques simples de façon à détecter des dysfonctionnements ou des surcharges.
+
+Ainsi, un graphique CPU à 100\% prouve que le processeur n'est pas assez performant, ou bien qu'un script ne fonctionne pas correctement et effectue une boucle sans fin.
+
+
