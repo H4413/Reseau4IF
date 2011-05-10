@@ -7,7 +7,7 @@ Mrtg (Multi Router Traffic Grapher) est un outil graphique fournissant les stati
 
 Il génère un graphique journalier, hebdomadaire, mensuel et annuel, ce qui permet une bonne vue d'ensemble. Il est ainsi très aisé de détecter une saturation du serveur, que se soit au niveau du trafic réseau que de la charge du processeur.
 
-\subsection{Installation}
+\section{Installation}
 
 Sous une distribuition basé en Debian, l'installation est rapide et efficace :
 
@@ -18,7 +18,7 @@ SNMP signifie Simple Network Management Protocol, il permet de vérifier que le 
 MRTG va nous générer les graphiques à partir des données récupérées par SNMP.
 
 
-\subsection{Configuration SNMP}
+\section{Configuration SNMP}
 
 On va commencer par éditer le fichier de configuration SNMP
 
@@ -65,7 +65,7 @@ Comme toutes les modifications, il faut redémarrer le service, on redémarre do
 /etc/init.d/snmpd restart
 
 
-\subsection{Configuration MRTG}
+\section{Configuration MRTG}
 
 Nous allons créer le dossier qui va contenir les graphiques :
 
@@ -125,7 +125,7 @@ On rajoute un ligne :
 Ce qui veut dire que la mise à jour sera exécutée par le système toutes les 5 minutes.
 
 
-\subsection {Plus de monitoring}
+\section {Plus de monitoring}
 
 Pour le moment, seul le trafic réseau est visible, nous allons rajouter le monitoring du CPU, de la SWAP, de la RAM.
 
@@ -197,7 +197,7 @@ MRTG utilise 2 courbes, il faut donc 2 données. On lui indique donc 2 sources d
 
 On fait la même chose pour le SWAP.
 
-\subsection{Conclusion}
+\section{Conclusion}
 
 MRTG permet de générer des graphiques simples de façon à détecter des dysfonctionnements ou des surcharges.
 

@@ -1,0 +1,114 @@
+\vfill \pagebreak
+\part{Monitoring d'un serveur Linux avec Nagios/NRPE}
+
+\section {Installation Nagios}
+Sous Fedora:
+# sudo yum install nagios3
+
+Pour installer un serveur Nagios sous Ubuntu/Debian, il suffit:
+# sudo apt-get install nagios3
+
+\section {Lancer Nagios}
+Vérifier qu'il n'a pas d'erreurs dans l'installation de Nagios:
+# /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+
+On devrait retrouver quelque chose comme ça:
+      Total Warnings: 0
+      Total Errors:   0
+      Things look okay - No serious problems were detected during the pre-flight check
+      
+Donc pour lancer Nagios, il suffit d'écrire:
+# service nagios start
+
+\section {Installation NRPE}
+Il faut installer le plugin NRPE. Pour cela, le plus simple est de faire confiance à votre gestionnaire de paquets.
+Sous Fedora, la commande suivante devrait suffire:
+# sudo yum install nagios-plugins-nrpe
+
+Sous Ubuntu/Debian:
+# sudo apt-get install nagios-nrpe-plugin
+
+Il faut également vérifier que la définition du plugin est bien présente dans le fichier de configuration des commandes (commands.cfg):
+...
+######
+# NRPE
+######
+# 'check_nrpe' command definition
+define command{
+command_name check_nrpe
+command_line \$USER1\$/check_nrpe -H \$HOSTADDRESS\$ -c \$ARG1\$
+}
+...
+
+
+\section {Serveur Linux à surveiller}
+
+La procédure est un peu plus longue. Il faut d'abord installer le daemon NRPE et les plugins Nagios (qui vont être lancés localement par le daemon NRPE):
+Sous Ubuntu/Debian:
+# sudo apt-get install nagios-nrpe-server
+# sudo apt-get install nagios-plugins
+
+Puis éditer le fichier /etc/nagios/nrpe.cfg pour modifier la ligne suivante:
+...
+allowed_hosts = Mettre ici l'adresse IP de votre serveur Nagios
+
+...
+
+On automatise le lancement du daemon au démarrage du serveur avec la commande:
+# chkconfig --add nrpe
+
+On ajoute une règle pour autoriser le Firewall IPtable à laisser passer les requêtes NRPE (à adapter selon vos règles):
+# iptables -I RH-Firewall-1-INPUT 10 -p tcp --dport 5666 -j ACCEPT
+
+Attention il faut mettre deux - (- -) avant l'option dport
+
+Il ne reste plus qu'à lancer le daemon:
+Sous Fedora:
+# service nrpe start
+Sous Ubuntu/Debien:
+# /etc/init.d/nagios-nrpe-server start
+
+\section {Tester la communication}
+Pour tester que la communication entre le serveur Nagios et le serveur à surveiller se passe bien, il suffit de se rendre dans le répertoire des plugins (/usr/lib/nagios/plugins) de Nagios et de tester le plugin NRPE:
+# ./check_nrpe -H Adresse_IP_du_serveur_Linux
+NRPE v2.7
+Si tout est OK, cette commande devrait renvoyer la version du daemon NRPE.
+
+Vous pouvez tester directement les plugins avec la commande suivante (exemple donnée pour un check de la charge):
+# ./check_nrpe -H Adresse_IP_du_serveur_Linux -c check_load
+
+\section {Configurer Nagios}
+La dernière étape consiste à modifier les fichiers de configuration de Nagios pour intégrer le monitoring du/des serveur Linux. Il faut dans un premier temps éditer votre fichier de configuration des hosts (hosts.cfg par défaut) et y ajouter votre machine Linux:
+define host {
+use generic-host
+host_name linus
+alias Ma machine Linux
+address 192.168.0.7
+}
+
+Puis ajouter les services offerts par NRPE (dans le fichier services.cfg), quelques exemples:
+# Charge CPU
+define service{
+use generic-service
+host_name remotehost
+service_description CPU Load
+check_command check_nrpe!check_load
+}
+# Memoire
+define service{
+use generic-service
+host_name remotehost
+service_description Memory
+check_command check_nrpe!check_mem
+}
+
+Pour ajouter des nouveaux plugins executable par NRPE, il faut éditer le fichier /etc/nagios/nrpe.cfg et ajouter une ligne par service:
+...
+command[check_disk]=/usr/lib/nagios/plugins/check_disk -w 20 -c 10 -p /dev/hda
+...
+
+Ne pas oublier de relancer le daemon quand on change le fichier de configuration (nrpe.cfg):
+# service nrpe restart
+
+
+
