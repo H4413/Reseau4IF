@@ -1,3 +1,72 @@
 \vfill \pagebreak
-\part{Monitoring d'un serveur Windows}
-% Intro
+\part{Monitoring depuis un poste Windows}
+
+\subsection{Introduction}
+Un serveur de supervision (SNMP/MRTG et/ou Nagios/NRPE) peut être configuré
+puis utilisé sans problèmes depuis une plateforme Windows ; il suffit pour
+cela de disposer d'un accès ssh vers la machine exécutant les logiciels de
+supervision, puis d'utiliser son éditeur de texte préféré pour configurer à
+volonté le serveur.\\
+
+Pour interfacer Nagios et Windows, un programme tiers est nécessaire ; on
+propose ici d'utiliser NSClient++ dans sa version 0.2.5e.
+
+\subsection{Installation de NSClient++}
+
+L'installation se fait à partir d'une invite de commande MS-Dos. Dans le
+dossier où l'archive NSClient++ a été décompressée, lancer la commande
+NSClient++ /install.
+
+\subsection{Configuration de NSClient++}
+
+Plusieurs choses doivent être faites :
+
+\subsubsection{Permettre à NSClient++ d'interagir avec le bureau}
+
+Il sera ainsi en mesure d'envoyer vers le serveur Nagios des informations
+concernant l'ordinateur monitoré.
+On procède de la façon suivante : Menu Démarrer/Accessoires/Outils
+d'administration/Service ; une fois ici il faut trouver le service associé
+à NSClient et lui donner l'autorisation.
+
+\subsubsection{Configuration de NSClient++ proprement dite}
+
+Elle s'effectue en éditant le fichier nsc.ini situé dans le répertoire
+d'installation du client. On y
+
+\begin{enumerate}
+\item décommente les modules que l'on souhaite utiliser
+\item redéfinit le mot de passe
+\item ajout le serveur Nagios dans la section Allowed Hosts (les
+différentes adresses sont ici séparées par des virgules)
+\item définit le port associé à NSClient++ en décommentant la ligne
+correspondante
+\end{enumerate}
+
+Après tout cela il faut relancer le service. On le fait grâce aux commandes
+suivantes :
+
+\begin{verbatim}
+NSClient++ /stop
+NSClient++ /start
+\end{verbatim}
+
+\subsubsection{Contrôles}
+
+Pour s'assurer que l'installation fonctionne, il faut tout d'abord vérifier
+que le port choisi à la section précédente est bien ouvert dans les
+différents pare-feux protégeant l'ordinateur.\\
+Une autre vérification est à mener au niveau du serveur Nagios. La commande
+suivante :
+
+\begin{verbatim}
+cd /usr/local/nagios/libexec # a adapter suivant votre installation
+./check_nt -H xxx.xxx.xxx.xxx -v CLIENTVERSION -p 12489
+\end{verbatim}
+
+\subsection{enregistrement du poste windows}
+
+Il suffit pour cela d'éditer le fichier nagios.cfg en décommentant la ligne
+correspondant à windows.cfg, puis d'éditer windows.cfg avec le nom et
+l'adresse IP de la machine à monitorer. Ne pas oublier de redémarrer Nagios
+pour que les changements soient pris en compte !
